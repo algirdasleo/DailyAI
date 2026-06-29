@@ -20,13 +20,10 @@ def main() -> None:
         print(e, file=sys.stderr)
         return
 
-    rendered = brief.markdown
-    print(rendered)
-
     out_dir = Path("briefs")
     out_dir.mkdir(exist_ok=True)
     path = out_dir / f"brief-{brief.brief_date:%Y-%m-%d}.md"
-    path.write_text(rendered)
+    path.write_text(brief.markdown)
 
 
 if __name__ == "__main__":
