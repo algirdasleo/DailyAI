@@ -16,8 +16,7 @@ uv run pytest               # run the pipeline tests
 Or with Docker:
 
 ```bash
-docker build -t dailyai .
-docker run --env-file .env -v "$PWD/briefs:/app/briefs" dailyai
+docker compose -f docker/docker-compose.yml up
 ```
 
 ## How it works
