@@ -1,0 +1,9 @@
+services:
+  dailyai:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file: ../.env
+    volumes:
+      - ../briefs:/app/briefs
+      - ../dailyai.db:/app/dailyai.db
