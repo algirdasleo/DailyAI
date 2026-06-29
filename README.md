@@ -1,4 +1,4 @@
-# DailyAI — AI News Executive Brief
+# DailyAI - yesterday's AI news in under 4 minutes
 
 DailyAI ingests AI/tech news from the open web and produces a daily
 executive brief - one document, scannable in 2-4 minutes, that leaves the
@@ -33,7 +33,7 @@ docker run --env-file .env -v "$PWD/briefs:/app/briefs" dailyai
 
 2. **Remove duplicate articles.**
 
-   > Drops the same article when it's posted multiple times, by comparing URLs > and fuzzy-matching titles.
+   > Drops the same article when it's posted multiple times, by comparing URLs and fuzzy-matching titles.
 
 3. **Embed & store each article.**
 
