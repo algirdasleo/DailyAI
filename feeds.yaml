@@ -1,0 +1,170 @@
+# Source registry. Each entry's `type` is looked up in SOURCE_REGISTRY
+# (see dailyai/factory.py); remaining keys are passed as kwargs to that
+# Source class. `window_hours` comes from Settings, not here - it's passed
+# to fetch() at ingest time, not baked into the source.
+#
+# rss: `authority` (0-1) feeds the ranking score.
+#      `ai_relevant: always` trusts every item; `filter` runs the keyword gate.
+#
+# scrape: listing-page scraper for sites with no feed. CSS selectors pick each
+#      item card and its parts. A `date` selector is REQUIRED - items without a
+#      parseable date are dropped, so the 24h window stays honest. Anchor on
+#      stable attributes (<time datetime>, a[href^=...]), not style classes.
+#        - type: scrape
+#          name: Anthropic News
+#          url: https://www.anthropic.com/news
+#          item: "a[href^='/news/']"   # CSS selector for each item container
+#          title: "h3"                  # title text within the item
+#          link: "a"                    # <a> whose href is the article (optional)
+#          date: "time"                 # element with a parseable datetime (required)
+#          authority: 0.8
+#          ai_relevant: filter
+sources:
+  - type: rss
+    name: OpenAI Blog
+    url: https://openai.com/blog/rss.xml
+    authority: 1.0
+    ai_relevant: always
+  - type: rss
+    name: Google DeepMind
+    url: https://deepmind.google/blog/rss.xml
+    authority: 1.0
+    ai_relevant: always
+  - type: rss
+    name: Google AI Blog
+    url: https://blog.google/technology/ai/rss/
+    authority: 0.9
+    ai_relevant: filter
+  - type: rss
+    name: Meta News
+    url: https://about.fb.com/news/feed/
+    authority: 0.8
+    ai_relevant: filter
+  - type: rss
+    name: Hugging Face Blog
+    url: https://huggingface.co/blog/feed.xml
+    authority: 0.9
+    ai_relevant: always
+  - type: rss
+    name: Google Research
+    url: https://research.google/blog/rss/
+    authority: 0.9
+    ai_relevant: filter
+  - type: rss
+    name: Microsoft Research
+    url: https://www.microsoft.com/en-us/research/feed/
+    authority: 0.9
+    ai_relevant: filter
+  - type: rss
+    name: NVIDIA AI
+    url: https://blogs.nvidia.com/feed/
+    authority: 0.8
+    ai_relevant: filter
+  - type: rss
+    name: PyTorch Blog
+    url: https://pytorch.org/blog/feed.xml
+    authority: 0.8
+    ai_relevant: filter
+  - type: rss
+    name: BAIR
+    url: https://bair.berkeley.edu/blog/feed.xml
+    authority: 0.8
+    ai_relevant: always
+  - type: rss
+    name: Allen Institute for AI
+    url: https://allenai.org/rss.xml
+    authority: 0.8
+    ai_relevant: always
+  - type: rss
+    name: Vector Institute
+    url: https://vectorinstitute.ai/feed/
+    authority: 0.7
+    ai_relevant: always
+  - type: rss
+    name: MIT Tech Review AI
+    url: https://www.technologyreview.com/topic/artificial-intelligence/feed
+    authority: 0.9
+    ai_relevant: always
+  - type: rss
+    name: TechCrunch
+    url: https://techcrunch.com/feed/
+    authority: 0.7
+    ai_relevant: filter
+  - type: rss
+    name: The Verge
+    url: https://www.theverge.com/rss/index.xml
+    authority: 0.7
+    ai_relevant: filter
+  - type: rss
+    name: VentureBeat
+    url: https://venturebeat.com/feed/
+    authority: 0.6
+    ai_relevant: filter
+  - type: rss
+    name: Ars Technica
+    url: https://feeds.arstechnica.com/arstechnica/index
+    authority: 0.7
+    ai_relevant: filter
+  - type: rss
+    name: AWS Machine Learning Blog
+    url: https://aws.amazon.com/blogs/machine-learning/feed/
+    authority: 0.8
+    ai_relevant: always
+  - type: rss
+    name: Together AI
+    url: https://www.together.ai/blog/rss.xml
+    authority: 0.7
+    ai_relevant: always
+  - type: rss
+    name: The Gradient
+    url: https://thegradient.pub/rss/
+    authority: 0.7
+    ai_relevant: always
+  - type: rss
+    name: Wired AI
+    url: https://www.wired.com/feed/tag/ai/latest/rss
+    authority: 0.7
+    ai_relevant: always
+  # arXiv firehoses: high volume, weekdays only (skips Sat/Sun). hf_papers
+  # already covers curated picks; these add raw preprints.
+  - type: rss
+    name: arXiv cs.AI
+    url: http://export.arxiv.org/rss/cs.AI
+    authority: 0.6
+    ai_relevant: always
+  - type: rss
+    name: arXiv cs.LG
+    url: http://export.arxiv.org/rss/cs.LG
+    authority: 0.6
+    ai_relevant: always
+  # General-tech / aggregator feeds - keyword gate trims non-AI items.
+  - type: rss
+    name: Simon Willison
+    url: https://simonwillison.net/atom/everything/
+    authority: 0.7
+    ai_relevant: filter
+  - type: rss
+    name: The Register
+    url: https://www.theregister.com/headlines.atom
+    authority: 0.6
+    ai_relevant: filter
+  - type: hackernews
+  - type: hf_papers
+  - type: scrape
+    name: Cursor Changelog
+    url: https://cursor.com/changelog
+    item: "article"
+    title: "h1"
+    link: "h1 a"
+    date: "time"
+    authority: 0.7
+    ai_relevant: filter
+  - type: scrape
+    name: ElevenLabs Blog
+    url: https://elevenlabs.io/blog
+    item: "article"
+    title: "h2"
+    link: "h2 a"
+    date: "time"
+    authority: 0.8
+    ai_relevant: always
