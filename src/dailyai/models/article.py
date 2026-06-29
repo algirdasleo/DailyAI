@@ -1,4 +1,4 @@
-"""Article covers a news Story and is the unit of ingestion, embedding, and clustering."""
+"""An article from a news source; unit of ingestion, embedding, and clustering."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class SourceCategory(StrEnum):
-    """How an Article was obtained - recorded on every Article for traceability."""
+    """Source type: RSS feed, API, or scraper."""
 
     FEED = "feed"
     API = "api"
@@ -19,15 +19,17 @@ class SourceCategory(StrEnum):
 
 
 class Article(BaseModel):
+    """News article with title, URL, source, and embedding."""
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     title: str
     url: str
-    source: str  # human name, e.g. "TechCrunch"
-    authority: float = Field(ge=0.0, le=1.0)  # from the source registry
-    published: datetime  # tz-aware UTC
-    summary: str = ""  # plain-text snippet (HTML stripped)
-    source_type: SourceCategory = SourceCategory.FEED  # for traceability
+    source: str
+    authority: float = Field(ge=0.0, le=1.0)
+    published: datetime
+    summary: str = ""
+    source_type: SourceCategory = SourceCategory.FEED
     embedding: Optional[np.ndarray] = None
 
     @property
