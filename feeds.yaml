@@ -1,24 +1,38 @@
-# Source registry. Each entry's `type` is looked up in SOURCE_REGISTRY
-# (see dailyai/factory.py); remaining keys are passed as kwargs to that
-# Source class. `window_hours` comes from Settings, not here - it's passed
-# to fetch() at ingest time, not baked into the source.
+# Source registry.
+# - `type` picks the Source class (see SOURCE_REGISTRY in factory.py);
+# - `authority` is a float [0, 1], used as indication how much to trust this source.
+# - `ai_relevant` is accepted by rss and scrape only:
+#     - 'always' trusts every item;
+#     - 'filter' keeps only AI content (relevance.py).
 #
-# rss: `authority` (0-1) feeds the ranking score.
-#      `ai_relevant: always` trusts every item; `filter` runs the keyword gate.
+# rss: standard feed.
+#       - type: rss
+#         name: OpenAI Blog
+#         url: https://openai.com/blog/rss.xml
+#         authority: 1.0             # optional
+#         ai_relevant: always        # optional
 #
-# scrape: listing-page scraper for sites with no feed. CSS selectors pick each
-#      item card and its parts. A `date` selector is REQUIRED - items without a
-#      parseable date are dropped, so the 24h window stays honest. Anchor on
-#      stable attributes (<time datetime>, a[href^=...]), not style classes.
-#        - type: scrape
-#          name: Anthropic News
-#          url: https://www.anthropic.com/news
-#          item: "a[href^='/news/']"   # CSS selector for each item container
-#          title: "h3"                  # title text within the item
-#          link: "a"                    # <a> whose href is the article (optional)
-#          date: "time"                 # element with a parseable datetime (required)
-#          authority: 0.8
-#          ai_relevant: filter
+# scrape: for sites with no feed. CSS selectors pick each item card and its parts.
+#       - type: scrape
+#         name: Anthropic News
+#         url: https://www.anthropic.com/news
+#         item: "a[href^='/news/']"  # CSS selector for each item container
+#         title: "h3"                # title text within the item
+#         link: "a"                  # optional; <a> whose href is the article, defaults to the item's first <a>
+#         date: "time"               # required; element with a parseable datetime
+#         authority: 0.8             # optional
+#         ai_relevant: filter        # optional
+#
+# hackernews: front-page HN stories, always filtered for AI relevance.
+#       - type: hackernews
+#         authority: 0.5             # optional
+#
+# hf_papers: trending Hugging Face papers, ranked by upvotes, never filtered
+#      for AI relevance.
+#       - type: hf_papers
+#         pool: 60                   # optional, how many candidates to fetch and rank by upvotes
+#         top_k: 15                  # optional, how many of the ranked candidates to keep
+#         authority: 0.75            # optional
 sources:
   - type: rss
     name: OpenAI Blog
@@ -125,8 +139,6 @@ sources:
     url: https://www.wired.com/feed/tag/ai/latest/rss
     authority: 0.7
     ai_relevant: always
-  # arXiv firehoses: high volume, weekdays only (skips Sat/Sun). hf_papers
-  # already covers curated picks; these add raw preprints.
   - type: rss
     name: arXiv cs.AI
     url: http://export.arxiv.org/rss/cs.AI
@@ -137,7 +149,6 @@ sources:
     url: http://export.arxiv.org/rss/cs.LG
     authority: 0.6
     ai_relevant: always
-  # General-tech / aggregator feeds - keyword gate trims non-AI items.
   - type: rss
     name: Simon Willison
     url: https://simonwillison.net/atom/everything/
